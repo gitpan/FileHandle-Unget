@@ -16,6 +16,7 @@ build_requires  (
 
 requires        (
                   'perl' => '5.004',
+                  'ExtUtils::MakeMaker::bytes' => 0,
                   'Scalar::Util' => '1.14',
                 );
 

@@ -1,3 +1,14 @@
+Version 0.1621:
+- Improved compatibility with versions of Perl older than 5.6.0, by replacing
+  "use bytes" with "use ExtUtils::MakeMaker::bytes". (Thanks to
+  <nothingmuch@woobling.org> for the bug report.)
+- Fixed test case error reporting for tests that fail to fork. (Thanks to
+  <corion-cpansmoker@corion.net> for the test failure report.)
+- Fixed unexpected success of binmode_bug.t test on Windows 2000. (Thanks to
+  Max Maischein <corion@corion.net> for the bug report.)
+- Fixed a bug in stdin_tell_bug.t. (Thanks to Max Maischein
+  <corion@corion.net> for the bug report.)
+
 Version 0.1620: Tue Dec 21 2004
 - Fixed version numbers, which were incompatible with some modules. (Thanks to
   Tassilo von Parseval <tassilo.von.parseval@rwth-aachen.de> for the bug

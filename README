@@ -8,12 +8,14 @@ string of bytes back on the input.
 
 NEW IN THIS VERSION
 
-Version 0.1620: Tue Dec 21 2004
-- Fixed version numbers, which were incompatible with some modules.
-- Switched to Test::More for better test reporting
-- Removed the use of the "English" module to work around a bug that exists in
-  some versions of Perl. See
-  http://groups.google.com/groups?th=e3483b06a956030e for more info.
+Version 0.1621: Sun Feb 6 2005
+- Improved compatibility with versions of Perl older than 5.6.0, by replacing
+  "use bytes" with "use ExtUtils::MakeMaker::bytes".
+- Fixed test case error reporting for tests that fail to fork.
+- Fixed unexpected success of binmode_bug.t test on Windows 2000. (Thanks to
+  Max Maischein for the bug report.)
+- Fixed a bug in stdin_tell_bug.t. (Thanks to Max Maischein for the bug
+  report.)
 
 
 MODULE DEPENDENCIES

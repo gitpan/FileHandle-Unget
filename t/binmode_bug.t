@@ -5,7 +5,18 @@ use Test::More tests => 2;
 
 TODO:
 {
-  local $TODO = 'This test is known to fail on Windows' if $^O =~ /Win32/i;
+  if ($^O eq 'Win32')
+  {
+    if (require Win32)
+    {
+      local $TODO = 'This test is known to fail on your version of Windows'
+        unless Win32::GetOSName() eq 'Win2000';
+    }
+    else
+    {
+      local $TODO = 'This test may fail on your version of Windows'
+    }
+  }
 
   my $filename = catfile('t','temp', 'output.txt');
 

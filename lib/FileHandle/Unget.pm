@@ -4,7 +4,7 @@ use strict;
 use Symbol;
 use FileHandle;
 use Exporter;
-use bytes;
+use ExtUtils::MakeMaker::bytes;
 use Scalar::Util qw( weaken );
 
 use 5.000;
@@ -13,7 +13,7 @@ use vars qw( @ISA $VERSION $AUTOLOAD @EXPORT @EXPORT_OK );
 
 @ISA = qw( Exporter FileHandle );
 
-$VERSION = sprintf "%d.%02d%02d", q/0.16.20/ =~ /(\d+)/g;
+$VERSION = sprintf "%d.%02d%02d", q/0.16.21/ =~ /(\d+)/g;
 
 @EXPORT = @FileHandle::EXPORT;
 @EXPORT_OK = @FileHandle::EXPORT_OK;

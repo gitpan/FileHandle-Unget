@@ -27,7 +27,9 @@ my $test_program = catfile 't','temp', 'test_program.pl';
 mkdir catfile('t','temp'), 0700;
 Write_Test_Program($test_program);
 
-my $test = "echo hello | $test_program";
+# Note: No space before the pipe because on Windows it is passed to the test
+# program
+my $test = "echo hello| $test_program";
 my $expected_stdout = qr/Starting at position (-1|0)\ngot: hello\ngot: world\n/;
 my $expected_stderr = '';
 
@@ -40,14 +42,16 @@ my $expected_stderr = '';
       unless grep { /^$inc$/ } @standard_inc;
   }
 
-  local $" = ' -I';
+  my $test_program_pattern = $test_program;
+  $test_program_pattern =~ s/\\/\\\\/g;
   if (@extra_inc)
   {
-    $test =~ s#\b$test_program\b#$^X -I@extra_inc $test_program#g;
+    local $" = ' -I';
+    $test =~ s#\b$test_program_pattern\b#$^X -I@extra_inc $test_program#g;
   }
   else
   {
-    $test =~ s#\b$test_program\b#$^X $test_program#g;
+    $test =~ s#\b$test_program_pattern\b#$^X $test_program#g;
   }
 }
 
@@ -56,6 +60,7 @@ my $test_stderr = catfile('t','temp',"test_program.stderr");
 
 system "$test 1>$test_stdout 2>$test_stderr";
 
+#1
 ok(!$?,'Executing external program');
 
 local $/ = undef;
@@ -69,9 +74,13 @@ open ACTUAL_STDERR, $test_stderr;
 $actual_stderr = <ACTUAL_STDERR>;
 close ACTUAL_STDERR;
 
+#2
 like($actual_stdout,$expected_stdout,'Output matches');
 
+#3
 is($actual_stderr,$expected_stderr,'Stderr matches');
+
+exit;
 
 # -------------------------------------------------------------------------------
 

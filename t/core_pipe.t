@@ -16,6 +16,10 @@ use Test::More tests => 2;
   {
     # 1
     ok(0, "Couldn't fork");
+
+    # 2
+    ok(0, "Couldn't get info from child");
+
     exit;
   }
 
