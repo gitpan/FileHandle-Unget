@@ -1,0 +1,18 @@
+README                                Read this first
+MANIFEST                              This file
+CHANGES                               A change history
+LICENSE                               A copy of the license
+Makefile.PL                           Makes the makefile
+lib/FileHandle/Unget.pm               One of the module files
+t/buffer.t                            Test program
+t/class_pipe.t                        Test program
+t/core_pipe.t                         Test program
+t/filehandle.t                        Test program
+t/fileno.t                            Test program
+t/new.t                               Test program
+t/overridden_pipe.t                   Test program
+t/seek.t                              Test program
+t/tell.t                              Test program
+t/ungetc.t                            Test program
+t/ungets.t                            Test program
+META.yml                                Module meta-data (added by MakeMaker)

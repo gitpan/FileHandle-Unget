@@ -1,0 +1,78 @@
+FileHandle::Unget - A FileHandle which supports ungetting of multiple bytes
+
+FileHandle::Unget is a drop-in replacement for FileHandle which allows more
+than one byte to be placed back on the input. It supports an ungetc(ORD) which
+can be called more than once in a row, and an ungets(SCALAR) which places a
+string of bytes back on the input.
+
+Version 0.10:
+- This is the initial version.
+
+
+DEPENDENCIES
+
+No non-standard modules are required.
+
+
+INSTALLATION
+
+  % perl Makefile.PL
+  % make
+  % make test
+  % make install
+
+The "perl Makefile.PL" command will prompt you for an installation location if
+you run it interactively, and will use the default values if it is run
+non-iteractively. You will be asked to select the locations of certain
+external compression programs.
+
+You can force it to run non-interactively by specifying the following:
+
+- either "PREFIX=/installation/path" (for installation into a custom
+  location), "INSTALLDIRS=site" (for installation into site-specific Perl
+  directories), or "INSTALLDIRS=perl" (for installation into standard Perl
+  directories).
+
+If make test fails, please see the INSTALLATION PROBLEMS section below.
+
+
+INSTALLATION PROBLEMS
+
+If "make test" fails, run
+
+  make test TEST_VERBOSE=1
+
+and see which test(s) are failing. Please email the results to the address
+below, or submit a bug report on the project website as described in the
+section REPORTING BUGS below.
+
+For other bugs, see the section REPORTING BUGS below.
+
+
+DOCUMENTATION
+
+Just "perldoc FileHandle::Unget". After installation on Unix systems,
+you can also do "man FileHandle::Unget".
+
+
+HOMEPAGE
+
+http://fh-unget.sourceforge.net/
+
+
+REPORTING BUGS
+
+You can report bugs by filing a bug report at the project homepage. 
+
+
+PRIMARY AUTHOR
+
+Written by David Coppit (david@coppit.org, http://coppit.org/), with the
+generous help of many kind people. See the file CHANGES for detailed
+information.
+
+
+LICENSE
+
+This code is distributed under the GNU General Public License (GPL). See
+the file LICENSE included in the distribution.
