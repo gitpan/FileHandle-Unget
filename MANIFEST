@@ -1,26 +1,46 @@
-README                                Read this first
-MANIFEST                              This file
-CHANGES                               A change history
-LICENSE                               A copy of the license
-Makefile.PL                           Makes the makefile
-lib/FileHandle/Unget.pm               One of the module files
-t/stdin_tell_bug.t                    Test program
-t/binmode_bug.t                       Test program
-t/buffer.t                            Test program
-t/class_pipe.t                        Test program
-t/core_pipe.t                         Test program
-t/dumper.t                            Test program
-t/eof.t                               Test program
-t/filehandle.t                        Test program
-t/fileno.t                            Test program
-t/gensym.t                            Test program
-t/loop_bug.t                          Test program
-t/memory_leak.t                       Test program
-t/multiple_handles.t                  Test program
-t/new.t                               Test program
-t/overridden_pipe.t                   Test program
-t/seek.t                              Test program
-t/tell.t                              Test program
-t/ungetc.t                            Test program
-t/ungets.t                            Test program
+CHANGES
+LICENSE
+MANIFEST
+Makefile.PL
+README
+
+# The module files
+lib/FileHandle/Unget.pm
+
+# Tests
+t/stdin_tell_bug.t
+t/binmode_bug.t
+t/buffer.t
+t/class_pipe.t
+t/core_pipe.t
+t/dumper.t
+t/eof.t
+t/filehandle.t
+t/fileno.t
+t/gensym.t
+t/input_record_separator.t
+t/loop_bug.t
+t/memory_leak.t
+t/multiple_handles.t
+t/new.t
+t/overridden_pipe.t
+t/seek.t
+t/tell.t
+t/ungetc.t
+t/ungets.t
+
+# Module::Install extensions
+inc/ExtUtils/AutoInstall.pm
+inc/Module/Install/AutoInstall.pm
+inc/Module/Install/Base.pm
+inc/Module/Install/Can.pm
+inc/Module/Install/CustomInstallationPath.pm
+inc/Module/Install/Fetch.pm
+inc/Module/Install/Include.pm
+inc/Module/Install/Makefile.pm
+inc/Module/Install/Metadata.pm
+inc/Module/Install/Win32.pm
+inc/Module/Install/WriteAll.pm
+inc/Module/Install.pm
+
 META.yml                                Module meta-data (added by MakeMaker)

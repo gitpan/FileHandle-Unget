@@ -1,3 +1,10 @@
+Version 0.16.0: Wed Sep 15 2004
+- Fixed stdin_tell_bug.t so that it's more platform-dependent. (Martin Thurn
+  <martin.thurn@ngc.com> reports that Solaris 2.8 returns 0 instead of -1).
+- Added filehandle-specific input_record_separator capability (Feature
+  suggestion by David Muir Sharnoff <muir@idiom.com>)
+- Changed Makefile.PL to use Module::Install
+
 Version 0.15:
 - Switched from WeakRef to Scalar::Util, which is included in recent versions
   of Perl. (Thanks to Joey Hess <joey@kitenet.net> for the suggestion and

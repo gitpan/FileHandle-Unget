@@ -13,7 +13,7 @@ use vars qw( @ISA $VERSION $AUTOLOAD @EXPORT @EXPORT_OK );
 
 @ISA = qw( Exporter FileHandle );
 
-$VERSION = '0.15';
+$VERSION = '0.16.0';
 
 @EXPORT = @FileHandle::EXPORT;
 @EXPORT_OK = @FileHandle::EXPORT_OK;
@@ -173,6 +173,31 @@ sub buffer
 
   tied(*$self)->{'filehandle_unget_buffer'} = shift if @_;
   return tied(*$self)->{'filehandle_unget_buffer'};
+}
+
+#-------------------------------------------------------------------------------
+
+sub input_record_separator
+{
+  my $self = shift;
+
+  if(@_)
+  {
+    tied(*$self)->{'input_record_separator'} = shift;
+    tied(*$self)->{'input_record_separator_specified'} = 1;
+  }
+
+  return undef unless exists tied(*$self)->{'input_record_separator'};
+  return tied(*$self)->{'input_record_separator'};
+}
+
+#-------------------------------------------------------------------------------
+
+sub clear_input_record_separator
+{
+  my $self = shift;
+
+  delete tied(*$self)->{'input_record_separator'};
 }
 
 ###############################################################################
@@ -344,9 +369,11 @@ sub getline
 
   my $line;
 
+  my $old_input_record_separator = $INPUT_RECORD_SEPARATOR;
+  $INPUT_RECORD_SEPARATOR = $self->{'input_record_separator'}
+    if exists $self->{'input_record_separator'};
   if (defined $INPUT_RECORD_SEPARATOR &&
-      $self->{'filehandle_unget_buffer'} =~
-        /(.*?$INPUT_RECORD_SEPARATOR)/)
+      $self->{'filehandle_unget_buffer'} =~ /(.*?$INPUT_RECORD_SEPARATOR)/)
   {
     $line = $1;
     substr($self->{'filehandle_unget_buffer'},0,length $line) = '';
@@ -366,6 +393,7 @@ sub getline
       $line .= $templine;
     }
   }
+  $INPUT_RECORD_SEPARATOR = $old_input_record_separator;
 
   tie *{$self->{'fh'}}, __PACKAGE__, $self;
 
@@ -389,6 +417,9 @@ sub getlines
 
   my @buffer_lines;
 
+  my $old_input_record_separator = $INPUT_RECORD_SEPARATOR;
+  $INPUT_RECORD_SEPARATOR = $self->{'input_record_separator'}
+    if exists $self->{'input_record_separator'};
   if (defined $INPUT_RECORD_SEPARATOR)
   {
     $self->{'filehandle_unget_buffer'} =~
@@ -429,6 +460,7 @@ sub getlines
       $buffer_lines[0] .= $templine;
     }
   }
+  $INPUT_RECORD_SEPARATOR = $old_input_record_separator;
 
   tie *{$self->{'fh'}}, __PACKAGE__, $self;
 
@@ -681,19 +713,19 @@ FileHandle::Unget - FileHandle which supports multi-byte unget
 
 =head1 SYNOPSIS
 
-    use FileHandle::Unget;
-    
-    # open file handle
-    my $fh = FileHandle::Unget->new("file")
-      or die "cannot open filehandle: $!";
-    
-    my $buffer;
-    read($fh,$buffer,100);
-    print $buffer;
+  use FileHandle::Unget;
+  
+  # open file handle
+  my $fh = FileHandle::Unget->new("file")
+    or die "cannot open filehandle: $!";
+  
+  my $buffer;
+  read($fh,$buffer,100);
+  print $buffer;
 
-    print <$fh>;
-    
-    $fh->close;
+  print <$fh>;
+  
+  $fh->close;
 
 
 =head1 DESCRIPTION
@@ -732,6 +764,7 @@ input stream. This method can be called more than once in a row to put
 multiple values back on the stream. Memory usage is equal to the total number
 of bytes pushed back.
 
+
 =item $fh->ungets ( BUF )
 
 Pushes a buffer back onto the given handle's input stream. This method can be
@@ -741,9 +774,26 @@ the stream.  Memory usage is equal to the total number of bytes pushed back.
 The buffer is not processed in any way--managing end-of-line characters and
 whatnot is your responsibility.
 
+
 =item $fh->buffer ( [BUF] )
 
 Get or set the pushback buffer directly.
+
+
+=item $fh->input_record_separator ( STRING )
+
+Get or set the per-filehandle input record separator. After it is called, the
+input record separator for the filehandle is independent of the global $/.
+Until this method is called (and after clear_input_record_separator is called)
+the global $/ is used.
+
+
+=item $fh->clear_input_record_separator ()
+
+Clear the per-filehandle input record separator. This removes the
+per-filehandle input record separator semantics, reverting the filehandle to
+the normal global $/ semantics.
+
 
 =item tell ( $fh )
 
@@ -757,6 +807,7 @@ First, the next bytes you read won't be the actual bytes on the filehandle at
 the position indicated by C<tell>.  Second, C<tell> will return a negative
 number if you unget more bytes than you read. (This can be problematic since
 this function returns -1 on error.)
+
 
 =item seek ( $fh, [POSITION], [WHENCE] )
 

@@ -1,5 +1,4 @@
-# Test ungets
-
+use strict;
 use lib 'lib';
 use FileHandle::Unget;
 use File::Spec::Functions qw(:ALL);

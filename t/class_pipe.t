@@ -1,5 +1,3 @@
-# Some tests for pipe compatibility
-
 use strict;
 use lib 'lib';
 use FileHandle::Unget;

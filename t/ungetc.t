@@ -1,5 +1,4 @@
-# Test ungetc
-
+use strict;
 use lib 'lib';
 use FileHandle;
 use FileHandle::Unget;

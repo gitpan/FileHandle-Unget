@@ -1,5 +1,3 @@
-# Some tests for FileHandle compatibility
-
 use strict;
 use lib 'lib';
 use FileHandle::Unget;

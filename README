@@ -5,46 +5,47 @@ than one byte to be placed back on the input. It supports an ungetc(ORD) which
 can be called more than once in a row, and an ungets(SCALAR) which places a
 string of bytes back on the input.
 
-Version 0.15:
-- Switched from WeakRef to Scalar::Util, which is included in recent versions
-  of Perl.
-- Fixed a bug involving pipes and tell(), where tell() would cause following
-  operations to fail.
-- Added new_from_fd support
-- Fixed a bug in which <$fh> would always behave as if called in a list
-  context after the first such call.
 
-DEPENDENCIES
+NEW IN THIS VERSION
 
-- WeakRef
+Version 0.16.0: Wed Sep 15 2004
+- Fixed stdin_tell_bug.t so that it's more platform-dependent.
+- Added filehandle-specific input_record_separator capability
+- Changed Makefile.PL to use Module::Install
 
-The modules can be found here:
 
-WeakRef:                 http://search.cpan.org/search?dist=WeakRef
+MODULE DEPENDENCIES
+ 
+To use this module, you will need to install:
 
-Installation can also be done automatically using the CPAN module:
+- Scalar::Util
 
-  perl -MCPAN -e 'install WeakRef'
+You should be prompted to install this module automatically when you run "perl
+Makefile.PL".
 
 
 INSTALLATION
 
-  % perl Makefile.PL
-  % make
-  % make test
-  % make install
+To install this package, change to the directory where you unarchived this
+distribution and type the following:
 
-The "perl Makefile.PL" command will prompt you for an installation location if
-you run it interactively, and will use the default values if it is run
-non-iteractively. You will be asked to select the locations of certain
-external compression programs.
+  perl Makefile.PL
+  make
+  make test
+  make install
 
-You can force it to run non-interactively by specifying the following:
+You will be prompted for installation locations. You can suppress these
+prompts by specifying either "PREFIX=/installation/path" (for installation
+into a custom location), "INSTALLDIRS=site" (for installation into
+site-specific Perl directories), or "INSTALLDIRS=perl" (for installation into
+standard Perl directories).
 
-- either "PREFIX=/installation/path" (for installation into a custom
-  location), "INSTALLDIRS=site" (for installation into site-specific Perl
-  directories), or "INSTALLDIRS=perl" (for installation into standard Perl
-  directories).
+If you make the installation into your own directory, then remember that you
+must tell perl where to search for modules before trying to 'use' them. For
+example:
+
+  use lib '/home/userid/lib';
+  use CGI::Cache;
 
 If make test fails, please see the INSTALLATION PROBLEMS section below.
 
@@ -76,7 +77,8 @@ you can also do "man FileHandle::Unget".
 
 HOMEPAGE
 
-http://fh-unget.sourceforge.net/
+Visit http://fh-unget.sourceforge.net/ for the latest version, mailing lists,
+discussion forums, CVS access, and more.
 
 
 REPORTING BUGS
@@ -84,14 +86,18 @@ REPORTING BUGS
 You can report bugs by filing a bug report at the project homepage. 
 
 
-PRIMARY AUTHOR
+COPYRIGHT
 
-Written by David Coppit (david@coppit.org, http://coppit.org/), with the
-generous help of many kind people. See the file CHANGES for detailed
-information.
+Copyright (c) 1998-Sep 1 2000 Broc Seib. Copyright (c) Sep 1 2000-2004 David
+Coppit. All rights reserved, save those granted by the license.
 
 
 LICENSE
 
-This code is distributed under the GNU General Public License (GPL). See
+This code is distributed under the GNU General Public License (GPL).  See
 the file LICENSE included in the distribution.
+
+
+AUTHOR
+
+David Coppit <david@coppit.org> 

@@ -1,5 +1,3 @@
-# Check for memory leaks
-
 use strict;
 use lib 'lib';
 use FileHandle::Unget;

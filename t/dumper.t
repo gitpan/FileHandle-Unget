@@ -1,5 +1,4 @@
-# Test Data::Dumper (used to crash with Perl 5.6.1)
-
+use strict;
 use lib 'lib';
 use FileHandle::Unget;
 use Data::Dumper;

@@ -33,7 +33,7 @@ mkdir catfile('t','temp'), 0700;
 Write_Test_Program($test_program);
 
 my $test = "echo hello | $test_program";
-my $expected_stdout = "Starting at position -1\ngot: hello\ngot: world\n";
+my $expected_stdout = "Starting at position (-1|0)\ngot: hello\ngot: world\n";
 my $expected_stderr = '';
 
 {
@@ -80,7 +80,7 @@ open ACTUAL_STDERR, $test_stderr;
 $actual_stderr = <ACTUAL_STDERR>;
 close ACTUAL_STDERR;
 
-if ($actual_stdout ne $expected_stdout)
+if ($actual_stdout =~ /^\Q$expected_stdout\E$/)
 {
   print "Standard output \"$actual_stdout\" does not match expected output " .
     "\"$expected_stdout\".\n";
