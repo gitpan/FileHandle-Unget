@@ -9,6 +9,7 @@ t/class_pipe.t                        Test program
 t/core_pipe.t                         Test program
 t/filehandle.t                        Test program
 t/fileno.t                            Test program
+t/gensym.t                            Test program
 t/new.t                               Test program
 t/overridden_pipe.t                   Test program
 t/seek.t                              Test program

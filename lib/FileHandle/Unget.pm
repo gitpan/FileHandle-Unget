@@ -12,7 +12,7 @@ use vars qw( @ISA $VERSION $AUTOLOAD @EXPORT @EXPORT_OK );
 
 @ISA = qw( Exporter FileHandle );
 
-$VERSION = '0.11';
+$VERSION = '0.12';
 
 @EXPORT = @FileHandle::EXPORT;
 @EXPORT_OK = @FileHandle::EXPORT_OK;
@@ -86,7 +86,7 @@ sub new
 
   my $self;
 
-  if (defined $_[0] && UNIVERSAL::isa($_[0],'IO::Handle'))
+  if (defined $_[0] && defined fileno $_[0])
   {
     $self = shift;
   }
@@ -310,7 +310,16 @@ sub getline
   else
   {
     $line = ${*{$self->{'fh'}}}{'filehandle_unget_buffer'};
-    $line .= $self->{'fh'}->getline(@_);
+    my $templine = $self->{'fh'}->getline(@_);
+
+    if ($line eq '' && !defined $templine)
+    {
+      $line = undef;
+    }
+    else
+    {
+      $line .= $templine;
+    }
   }
 
   tie *{$self->{'fh'}}, __PACKAGE__, $self->{'fh'};
@@ -344,11 +353,17 @@ sub getlines
 
     if (@other_lines)
     {
-      substr($other_lines[0],0,0) = ${*{$self->{'fh'}}}{'filehandle_unget_buffer'};
+      if (defined $other_lines[0])
+      {
+        substr($other_lines[0],0,0) = ${*{$self->{'fh'}}}{'filehandle_unget_buffer'};
+      }
     }
     else
     {
-      unshift @other_lines, ${*{$self->{'fh'}}}{'filehandle_unget_buffer'};
+      if (${*{$self->{'fh'}}}{'filehandle_unget_buffer'} ne '')
+      {
+        unshift @other_lines, ${*{$self->{'fh'}}}{'filehandle_unget_buffer'};
+      }
     }
 
     ${*{$self->{'fh'}}}{'filehandle_unget_buffer'} = '';
@@ -358,7 +373,16 @@ sub getlines
   else
   {
     $buffer_lines[0] = ${*{$self->{'fh'}}}{'filehandle_unget_buffer'};
-    $buffer_lines[0] .= ($self->{'fh'}->getlines(@_))[0];
+    my $templine = ($self->{'fh'}->getlines(@_))[0];
+
+    if ($buffer_lines[0] eq '' && !defined $templine)
+    {
+      $buffer_lines[0] = undef;
+    }
+    else
+    {
+      $buffer_lines[0] .= $templine;
+    }
   }
 
   tie *{$self->{'fh'}}, __PACKAGE__, $self->{'fh'};
@@ -479,7 +503,11 @@ sub seek
     untie *{$self->{'fh'}};
   }
 
-  return 0 if $whence != 0 && $whence != 1 && $whence != 2;
+  if($whence != 0 && $whence != 1 && $whence != 2)
+  {
+    tie *{$self->{'fh'}}, __PACKAGE__, $self->{'fh'};
+    return 0;
+  }
 
   my $status;
 
