@@ -13,7 +13,7 @@ use vars qw( @ISA $VERSION $AUTOLOAD @EXPORT @EXPORT_OK );
 
 @ISA = qw( Exporter FileHandle );
 
-$VERSION = '0.16.0';
+$VERSION = '0.16.1';
 
 @EXPORT = @FileHandle::EXPORT;
 @EXPORT_OK = @FileHandle::EXPORT_OK;

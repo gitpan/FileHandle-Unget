@@ -31,6 +31,7 @@ t/ungets.t
 
 # Module::Install extensions
 inc/ExtUtils/AutoInstall.pm
+inc/File/HomeDir.pm
 inc/Module/Install/AutoInstall.pm
 inc/Module/Install/Base.pm
 inc/Module/Install/Can.pm
