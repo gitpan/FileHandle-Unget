@@ -1,3 +1,9 @@
+Version 0.13:
+- Added detection for a case in which a Perl bug will be exercised on Windows.
+  Also added a test case (binmode_bug.t) to demonstrate it. See the BUGS
+  section of the documentation.
+- Added a couple new test cases.
+
 Version 0.12:
 - Changed the filehandle detection scheme so that filehandles created using
   Symbol::gensym would be detected correctly. (Thanks to Tassilo von Parseval

@@ -12,7 +12,7 @@ use vars qw( @ISA $VERSION $AUTOLOAD @EXPORT @EXPORT_OK );
 
 @ISA = qw( Exporter FileHandle );
 
-$VERSION = '0.12';
+$VERSION = '0.13';
 
 @EXPORT = @FileHandle::EXPORT;
 @EXPORT_OK = @FileHandle::EXPORT_OK;
@@ -99,6 +99,8 @@ sub new
   tie *$self, "${class}::Tie", $self;
 
   ${*$self}{'filehandle_unget_buffer'} = '';
+
+  ${*$self}{'eof_called'} = 0;
 
   bless $self, $class;
   return $self;
@@ -240,6 +242,9 @@ sub binmode
 {
   my $self = shift;
 
+  warn "Under windows, calling binmode after eof exposes a bug that exists in some versions of Perl.\n"
+    if ${*{$self->{'fh'}}}{'eof_called'};
+
   # Prevent recursion
   # Temporarily disable warnings so that we don't get "untie attempted
   # while 1 inner references still exist". Not sure what's the "right
@@ -310,6 +315,7 @@ sub getline
   else
   {
     $line = ${*{$self->{'fh'}}}{'filehandle_unget_buffer'};
+    ${*{$self->{'fh'}}}{'filehandle_unget_buffer'} = '';
     my $templine = $self->{'fh'}->getline(@_);
 
     if ($line eq '' && !defined $templine)
@@ -606,6 +612,8 @@ sub eof
 
   tie *{$self->{'fh'}}, __PACKAGE__, $self->{'fh'};
 
+  ${*{$self->{'fh'}}}{'eof_called'} = 1;
+
   return $eof;
 }
 
@@ -726,7 +734,26 @@ CPAN-1.76
 
 =head1 BUGS
 
-No known bugs.
+There is a bug in Perl on Windows that is exposed if you open a stream, then
+check for eof, then call binmode. For example:
+
+  # First line
+  # Second line
+
+  open FH, "$^X -e \"open F, '$0';binmode STDOUT;print <F>\" |";
+
+  eof(FH);
+  binmode(FH);
+
+  print "First line:", scalar <FH>, "\n";
+  print "Second line:", scalar <FH>, "\n";
+
+  close FH;
+
+One solution is to make sure that you only call binmode immediately after
+opening the filehandle. I'm not aware of any workaround for this bug that
+FileHandle::Unget could implement. However, the module does detect this
+situation and prints a warning.
 
 Contact david@coppit.org for bug reports and suggestions.
 

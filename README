@@ -5,11 +5,11 @@ than one byte to be placed back on the input. It supports an ungetc(ORD) which
 can be called more than once in a row, and an ungets(SCALAR) which places a
 string of bytes back on the input.
 
-Version 0.12:
-- Changed the filehandle detection scheme so that filehandles created using
-  Symbol::gensym would be detected correctly. 
-- Fixed a bug in getline and getlines which would cause the routines to not
-  return undef at the end of the file. 
+Version 0.13:
+- Added detection for a case in which a Perl bug will be exercised on Windows.
+  Also added a test case (binmode_bug.t) to demonstrate it. See the BUGS
+  section of the documentation.
+- Added a couple new test cases.
 
 
 DEPENDENCIES
@@ -50,6 +50,12 @@ below, or submit a bug report on the project website as described in the
 section REPORTING BUGS below.
 
 For other bugs, see the section REPORTING BUGS below.
+
+
+SECURITY NOTE
+
+On Windows, this module will use a temporary file to decompress a file handle
+when necessary. This could pose a security risk.
 
 
 DOCUMENTATION
