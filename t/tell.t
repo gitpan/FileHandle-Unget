@@ -16,6 +16,7 @@ my $filename = catfile('t','temp', 'output.txt');
   unlink $filename;
 
   my $fh = new FileHandle(">$filename");
+  binmode $fh;
   print $fh "first line\n";
   print $fh "second line\n";
   close $fh;

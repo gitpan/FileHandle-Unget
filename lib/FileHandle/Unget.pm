@@ -12,7 +12,7 @@ use vars qw( @ISA $VERSION $AUTOLOAD @EXPORT @EXPORT_OK );
 
 @ISA = qw( Exporter FileHandle );
 
-$VERSION = '0.10';
+$VERSION = '0.11';
 
 @EXPORT = @FileHandle::EXPORT;
 @EXPORT_OK = @FileHandle::EXPORT_OK;
@@ -300,14 +300,17 @@ sub getline
 
   my $line;
 
-  if (${*{$self->{'fh'}}}{'filehandle_unget_buffer'} =~ /(.*?$INPUT_RECORD_SEPARATOR)/)
+  if (defined $INPUT_RECORD_SEPARATOR &&
+      ${*{$self->{'fh'}}}{'filehandle_unget_buffer'} =~
+        /(.*?$INPUT_RECORD_SEPARATOR)/)
   {
     $line = $1;
     substr(${*{$self->{'fh'}}}{'filehandle_unget_buffer'},0,length $line) = '';
   }
   else
   {
-    $line = $self->{'fh'}->getline(@_);
+    $line = ${*{$self->{'fh'}}}{'filehandle_unget_buffer'};
+    $line .= $self->{'fh'}->getline(@_);
   }
 
   tie *{$self->{'fh'}}, __PACKAGE__, $self->{'fh'};
@@ -331,23 +334,32 @@ sub getlines
   }
 
   my @buffer_lines;
-  ${*{$self->{'fh'}}}{'filehandle_unget_buffer'} =~
-    s/^(.*$INPUT_RECORD_SEPARATOR)/push @buffer_lines, $1;''/mge;
 
-  my @other_lines = $self->{'fh'}->getlines(@_);
-
-  if (@other_lines)
+  if (defined $INPUT_RECORD_SEPARATOR)
   {
-    substr($other_lines[0],0,0) = ${*{$self->{'fh'}}}{'filehandle_unget_buffer'};
+    ${*{$self->{'fh'}}}{'filehandle_unget_buffer'} =~
+      s/^(.*$INPUT_RECORD_SEPARATOR)/push @buffer_lines, $1;''/mge;
+
+    my @other_lines = $self->{'fh'}->getlines(@_);
+
+    if (@other_lines)
+    {
+      substr($other_lines[0],0,0) = ${*{$self->{'fh'}}}{'filehandle_unget_buffer'};
+    }
+    else
+    {
+      unshift @other_lines, ${*{$self->{'fh'}}}{'filehandle_unget_buffer'};
+    }
+
+    ${*{$self->{'fh'}}}{'filehandle_unget_buffer'} = '';
+
+    push @buffer_lines, @other_lines;
   }
   else
   {
-    unshift @other_lines, ${*{$self->{'fh'}}}{'filehandle_unget_buffer'};
+    $buffer_lines[0] = ${*{$self->{'fh'}}}{'filehandle_unget_buffer'};
+    $buffer_lines[0] .= ($self->{'fh'}->getlines(@_))[0];
   }
-
-  ${*{$self->{'fh'}}}{'filehandle_unget_buffer'} = '';
-
-  push @buffer_lines, @other_lines;
 
   tie *{$self->{'fh'}}, __PACKAGE__, $self->{'fh'};
 
