@@ -17,7 +17,7 @@ my $filename = catfile('t','temp', 'output.txt');
 
   my $fh = new FileHandle(">$filename");
   binmode $fh;
-  print $fh "first line\n";
+  print $fh "this is the first line\n";
   print $fh "second line\n";
   close $fh;
 }
@@ -26,7 +26,7 @@ my $filename = catfile('t','temp', 'output.txt');
 {
   my $fh = new FileHandle::Unget($filename);
 
-  seek($fh,11,0);
+  seek($fh,23,0);
   my $line = <$fh>;
 
   # 1
@@ -38,17 +38,15 @@ my $filename = catfile('t','temp', 'output.txt');
   $line = <$fh>;
 
   # 2
-  ok($line,"first line\n");
+  ok($line,"this is the first line\n");
 
-  seek($fh,0,0);
   $fh->ungets("1234567890\n");
 
-  seek($fh,-11,0);
+  seek($fh,-11,1);
   $line = <$fh>;
 
   # 3
-  ok($line,"1234567890\n");
+  ok($line,"first line\n");
 
   $fh->close;
 }
-

@@ -8,11 +8,14 @@ t/binmode_bug.t                       Test program
 t/buffer.t                            Test program
 t/class_pipe.t                        Test program
 t/core_pipe.t                         Test program
+t/dumper.t                            Test program
 t/eof.t                               Test program
 t/filehandle.t                        Test program
 t/fileno.t                            Test program
 t/gensym.t                            Test program
 t/loop_bug.t                          Test program
+t/memory_leak.t                       Test program
+t/multiple_handles.t                  Test program
 t/new.t                               Test program
 t/overridden_pipe.t                   Test program
 t/seek.t                              Test program

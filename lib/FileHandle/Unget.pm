@@ -12,7 +12,7 @@ use vars qw( @ISA $VERSION $AUTOLOAD @EXPORT @EXPORT_OK );
 
 @ISA = qw( Exporter FileHandle );
 
-$VERSION = '0.13';
+$VERSION = '0.14';
 
 @EXPORT = @FileHandle::EXPORT;
 @EXPORT_OK = @FileHandle::EXPORT_OK;
@@ -80,6 +80,8 @@ sub DESTROY
 
 #-------------------------------------------------------------------------------
 
+use WeakRef;
+
 sub new
 {
   my $class = shift;
@@ -96,23 +98,19 @@ sub new
     return undef unless defined $self;
   }
 
-  tie *$self, "${class}::Tie", $self;
+  my $values =
+    {
+      'fh' => $self,
+      'eof_called' => 0,
+      'filehandle_unget_buffer' => '',
+    };
 
-  ${*$self}{'filehandle_unget_buffer'} = '';
-
-  ${*$self}{'eof_called'} = 0;
+  weaken($values->{'fh'});
+  
+  tie *$self, "${class}::Tie", $values;
 
   bless $self, $class;
   return $self;
-}
-
-#-------------------------------------------------------------------------------
-
-sub read
-{
-  my $self = shift;
-
-  tied(*$self)->read(@_);
 }
 
 #-------------------------------------------------------------------------------
@@ -122,7 +120,7 @@ sub ungetc
   my $self = shift;
   my $ord = shift;
 
-  substr(${*$self}{'filehandle_unget_buffer'},0,0) = chr($ord);
+  substr(tied(*$self)->{'filehandle_unget_buffer'},0,0) = chr($ord);
 }
 
 #-------------------------------------------------------------------------------
@@ -132,7 +130,7 @@ sub ungets
   my $self = shift;
   my $string = shift;
 
-  substr(${*$self}{'filehandle_unget_buffer'},0,0) = $string;
+  substr(tied(*$self)->{'filehandle_unget_buffer'},0,0) = $string;
 }
 
 #-------------------------------------------------------------------------------
@@ -141,8 +139,8 @@ sub buffer
 {
   my $self = shift;
 
-  ${*$self}{'filehandle_unget_buffer'} = shift if @_;
-  return ${*$self}{'filehandle_unget_buffer'};
+  tied(*$self)->{'filehandle_unget_buffer'} = shift if @_;
+  return tied(*$self)->{'filehandle_unget_buffer'};
 }
 
 ###############################################################################
@@ -168,7 +166,7 @@ my %tie_mapping = (
   PRINT => 'print', PRINTF => 'printf', WRITE => 'syswrite',
   READLINE => 'getline', GETC => 'getc', READ => 'read', CLOSE => 'close',
   BINMODE => 'binmode', OPEN => 'open', EOF => 'eof', FILENO => 'fileno',
-  SEEK => 'seek', TELL => 'tell',
+  SEEK => 'seek', TELL => 'tell', FETCH => 'fetch',
 );
 
 #-------------------------------------------------------------------------------
@@ -207,7 +205,7 @@ sub AUTOLOAD
 
         $self->{'fh'}->$sub(@_);
 
-        tie *{$self->{'fh'}}, __PACKAGE__, $self->{'fh'};
+        tie *{$self->{'fh'}}, __PACKAGE__, $self;
       }
     };
 
@@ -226,13 +224,10 @@ sub DESTROY
 sub TIEHANDLE
 {
   my $class = shift;
+  my $self = shift;
 
-  my $self;
+  bless($self, $class);
 
-  $self = bless({}, $class);
-
-  $self->{'fh'} = $_[0];
-  
   return $self;
 }
 
@@ -243,7 +238,7 @@ sub binmode
   my $self = shift;
 
   warn "Under windows, calling binmode after eof exposes a bug that exists in some versions of Perl.\n"
-    if ${*{$self->{'fh'}}}{'eof_called'};
+    if $self->{'eof_called'};
 
   # Prevent recursion
   # Temporarily disable warnings so that we don't get "untie attempted
@@ -263,7 +258,7 @@ sub binmode
     binmode $self->{'fh'};
   }
 
-  tie *{$self->{'fh'}}, __PACKAGE__, $self->{'fh'};
+  tie *{$self->{'fh'}}, __PACKAGE__, $self;
 }
 
 #-------------------------------------------------------------------------------
@@ -283,7 +278,7 @@ sub fileno
 
   my $fileno = fileno $self->{'fh'};
 
-  tie *{$self->{'fh'}}, __PACKAGE__, $self->{'fh'};
+  tie *{$self->{'fh'}}, __PACKAGE__, $self;
 
   return $fileno;
 }
@@ -306,16 +301,16 @@ sub getline
   my $line;
 
   if (defined $INPUT_RECORD_SEPARATOR &&
-      ${*{$self->{'fh'}}}{'filehandle_unget_buffer'} =~
+      $self->{'filehandle_unget_buffer'} =~
         /(.*?$INPUT_RECORD_SEPARATOR)/)
   {
     $line = $1;
-    substr(${*{$self->{'fh'}}}{'filehandle_unget_buffer'},0,length $line) = '';
+    substr($self->{'filehandle_unget_buffer'},0,length $line) = '';
   }
   else
   {
-    $line = ${*{$self->{'fh'}}}{'filehandle_unget_buffer'};
-    ${*{$self->{'fh'}}}{'filehandle_unget_buffer'} = '';
+    $line = $self->{'filehandle_unget_buffer'};
+    $self->{'filehandle_unget_buffer'} = '';
     my $templine = $self->{'fh'}->getline(@_);
 
     if ($line eq '' && !defined $templine)
@@ -328,7 +323,7 @@ sub getline
     }
   }
 
-  tie *{$self->{'fh'}}, __PACKAGE__, $self->{'fh'};
+  tie *{$self->{'fh'}}, __PACKAGE__, $self;
 
   return $line;
 }
@@ -352,7 +347,7 @@ sub getlines
 
   if (defined $INPUT_RECORD_SEPARATOR)
   {
-    ${*{$self->{'fh'}}}{'filehandle_unget_buffer'} =~
+    $self->{'filehandle_unget_buffer'} =~
       s/^(.*$INPUT_RECORD_SEPARATOR)/push @buffer_lines, $1;''/mge;
 
     my @other_lines = $self->{'fh'}->getlines(@_);
@@ -361,24 +356,24 @@ sub getlines
     {
       if (defined $other_lines[0])
       {
-        substr($other_lines[0],0,0) = ${*{$self->{'fh'}}}{'filehandle_unget_buffer'};
+        substr($other_lines[0],0,0) = $self->{'filehandle_unget_buffer'};
       }
     }
     else
     {
-      if (${*{$self->{'fh'}}}{'filehandle_unget_buffer'} ne '')
+      if ($self->{'filehandle_unget_buffer'} ne '')
       {
-        unshift @other_lines, ${*{$self->{'fh'}}}{'filehandle_unget_buffer'};
+        unshift @other_lines, $self->{'filehandle_unget_buffer'};
       }
     }
 
-    ${*{$self->{'fh'}}}{'filehandle_unget_buffer'} = '';
+    $self->{'filehandle_unget_buffer'} = '';
 
     push @buffer_lines, @other_lines;
   }
   else
   {
-    $buffer_lines[0] = ${*{$self->{'fh'}}}{'filehandle_unget_buffer'};
+    $buffer_lines[0] = $self->{'filehandle_unget_buffer'};
     my $templine = ($self->{'fh'}->getlines(@_))[0];
 
     if ($buffer_lines[0] eq '' && !defined $templine)
@@ -391,7 +386,7 @@ sub getlines
     }
   }
 
-  tie *{$self->{'fh'}}, __PACKAGE__, $self->{'fh'};
+  tie *{$self->{'fh'}}, __PACKAGE__, $self;
 
   return @buffer_lines;
 }
@@ -413,17 +408,17 @@ sub getc
 
   my $char;
 
-  if (${*{$self->{'fh'}}}{'filehandle_unget_buffer'} ne '')
+  if ($self->{'filehandle_unget_buffer'} ne '')
   {
-    $char = substr(${*{$self->{'fh'}}}{'filehandle_unget_buffer'},0,1);
-    substr(${*{$self->{'fh'}}}{'filehandle_unget_buffer'},0,1) = '';
+    $char = substr($self->{'filehandle_unget_buffer'},0,1);
+    substr($self->{'filehandle_unget_buffer'},0,1) = '';
   }
   else
   {
     $char = $self->{'fh'}->getc(@_);
   }
 
-  tie *{$self->{'fh'}}, __PACKAGE__, $self->{'fh'};
+  tie *{$self->{'fh'}}, __PACKAGE__, $self;
 
   return $char;
 }
@@ -449,10 +444,10 @@ sub read
 
   my $num_bytes_read = 0;
 
-  if (${*{$self->{'fh'}}}{'filehandle_unget_buffer'} ne '')
+  if ($self->{'filehandle_unget_buffer'} ne '')
   {
-    my $read_string = substr(${*{$self->{'fh'}}}{'filehandle_unget_buffer'},0,$length);
-    substr(${*{$self->{'fh'}}}{'filehandle_unget_buffer'},0,$length) = '';
+    my $read_string = substr($self->{'filehandle_unget_buffer'},0,$length);
+    substr($self->{'filehandle_unget_buffer'},0,$length) = '';
 
     my $num_bytes_buffer = length $read_string;
 
@@ -487,7 +482,7 @@ sub read
     }
   }
 
-  tie *{$self->{'fh'}}, __PACKAGE__, $self->{'fh'};
+  tie *{$self->{'fh'}}, __PACKAGE__, $self;
 
   return $num_bytes_read;
 }
@@ -511,7 +506,7 @@ sub seek
 
   if($whence != 0 && $whence != 1 && $whence != 2)
   {
-    tie *{$self->{'fh'}}, __PACKAGE__, $self->{'fh'};
+    tie *{$self->{'fh'}}, __PACKAGE__, $self;
     return 0;
   }
 
@@ -520,7 +515,7 @@ sub seek
   # First try to seek using the built-in seek
   if (seek($self->{'fh'},$position,$whence))
   {
-    ${*{$self->{'fh'}}}{'filehandle_unget_buffer'} = '';
+    $self->{'filehandle_unget_buffer'} = '';
     $status = 1;
   }
   else
@@ -535,7 +530,7 @@ sub seek
     {
       if ($absolute_position >= $self->tell)
       {
-        substr(${*{$self->{'fh'}}}{'filehandle_unget_buffer'}, 0,
+        substr($self->{'filehandle_unget_buffer'}, 0,
           $absolute_position - $self->tell) = '';
         $status = 1;
       }
@@ -553,7 +548,7 @@ sub seek
     }
   }
 
-  tie *{$self->{'fh'}}, __PACKAGE__, $self->{'fh'};
+  tie *{$self->{'fh'}}, __PACKAGE__, $self;
 
   return $status;
 }
@@ -577,9 +572,9 @@ sub tell
 
   return -1 if $file_position == -1;
 
-  $file_position -= length(${*{$self->{'fh'}}}{'filehandle_unget_buffer'});
+  $file_position -= length($self->{'filehandle_unget_buffer'});
 
-  tie *{$self->{'fh'}}, __PACKAGE__, $self->{'fh'};
+  tie *{$self->{'fh'}}, __PACKAGE__, $self;
 
   return $file_position;
 }
@@ -601,7 +596,7 @@ sub eof
 
   my $eof;
 
-  if (${*{$self->{'fh'}}}{'filehandle_unget_buffer'} ne '')
+  if ($self->{'filehandle_unget_buffer'} ne '')
   {
     $eof = 0;
   }
@@ -610,11 +605,19 @@ sub eof
     $eof = $self->{'fh'}->eof();
   }
 
-  tie *{$self->{'fh'}}, __PACKAGE__, $self->{'fh'};
+  tie *{$self->{'fh'}}, __PACKAGE__, $self;
 
-  ${*{$self->{'fh'}}}{'eof_called'} = 1;
+  $self->{'eof_called'} = 1;
 
   return $eof;
+}
+
+#-------------------------------------------------------------------------------
+
+sub fetch
+{
+  my $self = shift;
+  return $self;
 }
 
 1;
@@ -728,8 +731,6 @@ data!)
 To test that this module is indeed a drop-in replacement for FileHandle, the
 following modules were modified to use FileHandle::Unget, and tested using
 "make test". They have all passed.
-
-CPAN-1.76
 
 
 =head1 BUGS

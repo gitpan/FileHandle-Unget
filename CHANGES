@@ -1,3 +1,15 @@
+Version 0.14:
+- Fixed an incompatibility with perl 5.6.1 and Data::Dumper. (Thanks to Jason
+  Brunette <jbrunette@users.sourceforge.net> for the bug report and patch.)
+- Fixed a bug in the seek.t test case which would cause failure on Windows
+  (Thanks to rurban@x-ray.at for the bug report.)
+- Fixed a memory leak. (Thanks to Jason Brunette
+  <jbrunette@users.sourceforge.net> for taking the time to not only file the
+  bug report, but also do a lot of work to track down the cause.) For now I'm
+  using WeakRef to deal with circular references. If anyone can tell me how to
+  get rid of them entirely I'd be grateful. See the discussion here:
+  https://sourceforge.net/tracker/index.php?func=detail&aid=892742&group_id=93038&atid=602891
+
 Version 0.13:
 - Added detection for a case in which a Perl bug will be exercised on Windows.
   Also added a test case (binmode_bug.t) to demonstrate it. See the BUGS

@@ -5,16 +5,23 @@ than one byte to be placed back on the input. It supports an ungetc(ORD) which
 can be called more than once in a row, and an ungets(SCALAR) which places a
 string of bytes back on the input.
 
-Version 0.13:
-- Added detection for a case in which a Perl bug will be exercised on Windows.
-  Also added a test case (binmode_bug.t) to demonstrate it. See the BUGS
-  section of the documentation.
-- Added a couple new test cases.
+Version 0.14:
+- Fixed an incompatibility with perl 5.6.1 and Data::Dumper.
+- Fixed a bug in the seek.t test case which would cause failure on Windows
+- Fixed a memory leak.
 
 
 DEPENDENCIES
 
-No non-standard modules are required.
+- WeakRef
+
+The modules can be found here:
+
+WeakRef:                 http://search.cpan.org/search?dist=WeakRef
+
+Installation can also be done automatically using the CPAN module:
+
+  perl -MCPAN -e 'install WeakRef'
 
 
 INSTALLATION
