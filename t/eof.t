@@ -1,10 +1,7 @@
 use strict;
-use lib 'lib';
 use FileHandle::Unget;
 use File::Spec::Functions qw(:ALL);
-use Test;
-
-plan (tests => 4);
+use Test::More tests => 4;
 
 my $filename = catfile('t','temp', 'output.txt');
 
@@ -26,15 +23,15 @@ my $filename = catfile('t','temp', 'output.txt');
   
   $line = <$fh>;
   # 1
-  ok($line,"first line\n");
+  is($line,"first line\n",'Read first line');
 
   $line = <$fh>;
   # 2
-  ok($line,"second line\n");
+  is($line,"second line\n",'Read second line');
 
   $line = <$fh>;
   # 3
-  ok($line,undef);
+  is($line,undef,'EOF getline');
 
   $fh->close;
 }
@@ -50,7 +47,7 @@ my $filename = catfile('t','temp', 'output.txt');
 
   my @lines = $fh->getlines();
   # 4
-  ok($lines[0],undef);
+  is($lines[0],undef,'EOF getlines');
 
   $fh->close;
 }

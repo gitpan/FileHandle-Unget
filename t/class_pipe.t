@@ -1,9 +1,6 @@
 use strict;
-use lib 'lib';
 use FileHandle::Unget;
-use Test;
-
-plan (tests => 2);
+use Test::More tests => 2;
 
 #-------------------------------------------------------------------------------
 
@@ -13,16 +10,11 @@ plan (tests => 2);
 
   my $pid = fork();
 
-  if(defined($pid))
-  {
-    # Prevent the child from reporting as well
-    # 1
-    ok(1) if $pid;
-  }
-  else
+  unless(defined $pid)
   {
     # 1
-    ok(0), exit unless defined($pid);
+    ok(0, "Couldn't fork");
+    exit;
   }
 
   # In parent
@@ -30,11 +22,14 @@ plan (tests => 2);
   {
     close $in;
 
+    # 1
+    ok(1, 'Fork succeeded');
+
     local $/ = undef;
     my $results = <$out>;
 
     # 2
-    ok($results,"Some info from the child\nSome more\n");
+    is($results,"Some info from the child\nSome more\n", 'Child output');
 
     exit;
   }

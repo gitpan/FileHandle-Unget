@@ -13,7 +13,7 @@ use vars qw( @ISA $VERSION $AUTOLOAD @EXPORT @EXPORT_OK );
 
 @ISA = qw( Exporter FileHandle );
 
-$VERSION = '0.16.1';
+$VERSION = sprintf "%d.%02d%02d", q/0.16.20/ =~ /(\d+)/g;
 
 @EXPORT = @FileHandle::EXPORT;
 @EXPORT_OK = @FileHandle::EXPORT_OK;
@@ -207,7 +207,6 @@ package FileHandle::Unget::Tie;
 use strict;
 use FileHandle;
 use bytes;
-use English '-no_match_vars';
 
 use 5.000;
 
@@ -369,11 +368,13 @@ sub getline
 
   my $line;
 
-  my $old_input_record_separator = $INPUT_RECORD_SEPARATOR;
-  $INPUT_RECORD_SEPARATOR = $self->{'input_record_separator'}
+  my $old_input_record_separator = $/;
+  $/ = $self->{'input_record_separator'}
     if exists $self->{'input_record_separator'};
-  if (defined $INPUT_RECORD_SEPARATOR &&
-      $self->{'filehandle_unget_buffer'} =~ /(.*?$INPUT_RECORD_SEPARATOR)/)
+  my $input_record_separator = $/;
+
+  if (defined $input_record_separator &&
+      $self->{'filehandle_unget_buffer'} =~ /(.*?$input_record_separator)/)
   {
     $line = $1;
     substr($self->{'filehandle_unget_buffer'},0,length $line) = '';
@@ -393,7 +394,7 @@ sub getline
       $line .= $templine;
     }
   }
-  $INPUT_RECORD_SEPARATOR = $old_input_record_separator;
+  $/ = $old_input_record_separator;
 
   tie *{$self->{'fh'}}, __PACKAGE__, $self;
 
@@ -417,13 +418,15 @@ sub getlines
 
   my @buffer_lines;
 
-  my $old_input_record_separator = $INPUT_RECORD_SEPARATOR;
-  $INPUT_RECORD_SEPARATOR = $self->{'input_record_separator'}
+  my $old_input_record_separator = $/;
+  $/ = $self->{'input_record_separator'}
     if exists $self->{'input_record_separator'};
-  if (defined $INPUT_RECORD_SEPARATOR)
+  my $input_record_separator = $/;
+
+  if (defined $input_record_separator)
   {
     $self->{'filehandle_unget_buffer'} =~
-      s/^(.*$INPUT_RECORD_SEPARATOR)/push @buffer_lines, $1;''/mge;
+      s/^(.*$input_record_separator)/push @buffer_lines, $1;''/mge;
 
     my @other_lines = $self->{'fh'}->getlines(@_);
 
@@ -460,7 +463,7 @@ sub getlines
       $buffer_lines[0] .= $templine;
     }
   }
-  $INPUT_RECORD_SEPARATOR = $old_input_record_separator;
+  $/ = $old_input_record_separator;
 
   tie *{$self->{'fh'}}, __PACKAGE__, $self;
 

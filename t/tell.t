@@ -1,10 +1,7 @@
 use strict;
-use lib 'lib';
 use FileHandle::Unget;
 use File::Spec::Functions qw(:ALL);
-use Test;
-
-plan (tests => 5);
+use Test::More tests => 5;
 
 my $filename = catfile('t','temp', 'output.txt');
 
@@ -26,11 +23,11 @@ my $filename = catfile('t','temp', 'output.txt');
 
   my $line = <$fh>;
   # 1
-  ok(tell($fh),11);
+  is(tell($fh),11,'Tell 1');
 
   $line = <$fh>;
   # 2
-  ok(tell($fh),23);
+  is(tell($fh),23,'Tell 2');
 
   $fh->close;
 }
@@ -41,15 +38,15 @@ my $filename = catfile('t','temp', 'output.txt');
 
   my $line = <$fh>;
   # 3
-  ok(tell($fh),11);
+  is(tell($fh),11,'Tell 3');
 
   $fh->ungets('12345');
   # 4
-  ok(tell($fh),6);
+  is(tell($fh),6,'Tell 4');
 
   $fh->ungets('1234567890');
   # 5
-  ok(tell($fh),-4);
+  is(tell($fh),-4,'Tell 5');
 
   $fh->close;
 }

@@ -1,10 +1,7 @@
 use strict;
-use lib 'lib';
 use FileHandle::Unget;
 use File::Spec::Functions qw(:ALL);
-use Test;
-
-plan (tests => 13);
+use Test::More tests => 13;
 
 my $filename = catfile('t','temp', 'output.txt');
 
@@ -27,7 +24,7 @@ my $filename = catfile('t','temp', 'output.txt');
   close $fh;
 
   # 1
-  ok($results, "first line\nsecond line\n");
+  is($results, "first line\nsecond line\n",'No eol separator');
 }
 
 # Test input_line_number and scalar line reading, $fh->close
@@ -35,15 +32,15 @@ my $filename = catfile('t','temp', 'output.txt');
   my $fh = new FileHandle::Unget($filename);
 
   # 2
-  ok($fh->input_line_number(),0);
+  is($fh->input_line_number(),0,'Input line number at start');
 
   my $line = <$fh>;
   # 3
-  ok($line,"first line\n");
+  is($line,"first line\n",'First line');
 
   $line = <$fh>;
   # 4
-  ok($fh->input_line_number(),2);
+  is($fh->input_line_number(),2,'Input line number at middle');
 
   $fh->close;
 }
@@ -54,14 +51,14 @@ my $filename = catfile('t','temp', 'output.txt');
 
   my @lines = <$fh>;
   # 5
-  ok($#lines,1);
+  is($#lines,1,'Getlines size');
   # 6
-  ok($lines[0],"first line\n");
+  is($lines[0],"first line\n",'First line');
   # 7
-  ok($lines[1],"second line\n");
+  is($lines[1],"second line\n",'Second line');
 
   # 8
-  ok(eof $fh,1);
+  ok(eof $fh,'EOF');
 
   $fh->close;
 }
@@ -74,9 +71,9 @@ my $filename = catfile('t','temp', 'output.txt');
   my $result = read($fh, $buf, 8);
 
   # 9
-  ok($buf,'first li');
+  is($buf,'first li','read() function');
   # 10
-  ok($result,8);
+  is($result,8,'Number of bytes read');
 
   $fh->close;
 }
@@ -89,9 +86,9 @@ my $filename = catfile('t','temp', 'output.txt');
   my $result = $fh->read($buf, 8);
 
   # 11
-  ok($buf,'first li');
+  is($buf,'first li','read() method');
   # 12
-  ok($result,8);
+  is($result,8,'Number of bytes read');
 
   $fh->close;
 }
@@ -103,7 +100,7 @@ my $filename = catfile('t','temp', 'output.txt');
 
   my $line = <$fh>;
   # 13
-  ok($line,"first line\n");
+  is($line,"first line\n",'new from fd');
 
   $fh->close;
 }

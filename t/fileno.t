@@ -1,10 +1,7 @@
 use strict;
-use lib 'lib';
 use FileHandle::Unget;
 use File::Spec::Functions qw(:ALL);
-use Test;
-
-plan (tests => 1);
+use Test::More tests => 1;
 
 my $filename = catfile('t','temp', 'output.txt');
 
@@ -17,7 +14,7 @@ my $filename = catfile('t','temp', 'output.txt');
   print $fh "first line\n";
 
   # 1
-  ok(fileno($fh), qr/^\d+$/);
+  like(fileno($fh), qr/^\d+$/, 'fileno()');
 
   close $fh;
 }

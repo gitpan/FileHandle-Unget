@@ -1,11 +1,8 @@
 use strict;
-use lib 'lib';
 use FileHandle;
 use FileHandle::Unget;
 use File::Spec::Functions qw(:ALL);
-use Test;
-
-plan (tests => 3);
+use Test::More tests => 3;
 
 my $filename = catfile('t','temp', 'output.txt');
 
@@ -35,16 +32,16 @@ my $filename = catfile('t','temp', 'output.txt');
   $fh->buffer("inse" . $fh->buffer);
 
   # 1
-  ok($fh->buffer, "inserted\n");
+  is($fh->buffer, "inserted\n");
 
   $line = <$fh>;
 
   # 2
-  ok($line, "inserted\n");
+  is($line, "inserted\n");
 
   $line = <$fh>;
   # 3
-  ok($line, "second line\n");
+  is($line, "second line\n");
 
   $fh->close;
 }

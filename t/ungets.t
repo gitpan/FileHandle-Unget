@@ -1,10 +1,7 @@
 use strict;
-use lib 'lib';
 use FileHandle::Unget;
 use File::Spec::Functions qw(:ALL);
-use Test;
-
-plan (tests => 9);
+use Test::More tests => 9;
 
 my $filename = catfile('t','temp', 'output.txt');
 
@@ -31,11 +28,11 @@ my $filename = catfile('t','temp', 'output.txt');
   $line = <$fh>;
 
   # 1
-  ok($line, "inserted\n");
+  is($line, "inserted\n", 'ungets() 1');
 
   $line = <$fh>;
   # 2
-  ok($line, "second line\n");
+  is($line, "second line\n", 'getline()');
 
   $fh->close;
 }
@@ -50,15 +47,15 @@ my $filename = catfile('t','temp', 'output.txt');
 
   read($fh, $line, 6);
   # 3
-  ok($line, "insert");
+  is($line, "insert", 'ungets() 2');
 
   $line = <$fh>;
   # 4
-  ok($line, "ed\n");
+  is($line, "ed\n", 'getline()');
 
   $line = <$fh>;
   # 5
-  ok($line, "second line\n");
+  is($line, "second line\n", 'getline() 2');
 
   $fh->close;
 }
@@ -74,19 +71,19 @@ my $filename = catfile('t','temp', 'output.txt');
 
   read($fh, $line, 6);
   # 6
-  ok($line, "insert");
+  is($line, "insert", 'ungets()');
 
   $line = <$fh>;
   # 7
-  ok($line, "ed1\n");
+  is($line, "ed1\n", 'getline() 1');
 
   $line = <$fh>;
   # 8
-  ok($line, "inserted2\n");
+  is($line, "inserted2\n", 'getline() 2');
 
   $line = <$fh>;
   # 9
-  ok($line, "second line\n");
+  is($line, "second line\n", 'getline() 3');
 
   $fh->close;
 }

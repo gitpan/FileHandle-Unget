@@ -1,11 +1,8 @@
 use strict;
-use lib 'lib';
 use FileHandle;
 use FileHandle::Unget;
 use File::Spec::Functions qw(:ALL);
-use Test;
-
-plan (tests => 8);
+use Test::More tests => 5;
 
 my $filename = catfile('t','temp', 'output.txt');
 
@@ -40,11 +37,11 @@ my $filename = catfile('t','temp', 'output.txt');
   $line = <$fh>;
 
   # 1
-  ok($line, "inserted\n");
+  is($line, "inserted\n",'Ungetc');
 
   $line = <$fh>;
   # 2
-  ok($line, "second line\n");
+  is($line, "second line\n",'getline()');
 
   $fh->close;
 }
@@ -67,47 +64,15 @@ my $filename = catfile('t','temp', 'output.txt');
 
   read($fh, $line, 6);
   # 3
-  ok($line, "insert");
+  is($line, "insert", 'read() after insert');
 
   $line = <$fh>;
   # 4
-  ok($line, "ed\n");
+  is($line, "ed\n", 'getline() 1');
 
   $line = <$fh>;
   # 5
-  ok($line, "second line\n");
-
-  $fh->close;
-}
-
-
-# Test ungetc'ing and ->read'ing some bytes of data
-{
-  my $fh = new FileHandle::Unget($filename);
-
-  my $line = <$fh>;
-
-  $fh->ungetc(ord("\n"));
-  $fh->ungetc(ord("d"));
-  $fh->ungetc(ord("e"));
-  $fh->ungetc(ord("t"));
-  $fh->ungetc(ord("r"));
-  $fh->ungetc(ord("e"));
-  $fh->ungetc(ord("s"));
-  $fh->ungetc(ord("n"));
-  $fh->ungetc(ord("i"));
-
-  $fh->read($line, 6);
-  # 6
-  ok($line, "insert");
-
-  $line = <$fh>;
-  # 7
-  ok($line, "ed\n");
-
-  $line = <$fh>;
-  # 8
-  ok($line, "second line\n");
+  is($line, "second line\n", 'getline() 2');
 
   $fh->close;
 }

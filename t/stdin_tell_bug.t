@@ -1,8 +1,7 @@
 use strict;
-use lib 'lib';
 use FileHandle::Unget;
 use File::Spec::Functions qw(:ALL);
-use Test;
+use Test::More tests => 3;
 
 # -------------------------------------------------------------------------------
 
@@ -23,17 +22,13 @@ else
 
 # -------------------------------------------------------------------------------
 
-plan (tests => 1);
-
-# -------------------------------------------------------------------------------
-
 my $test_program = catfile 't','temp', 'test_program.pl';
 
 mkdir catfile('t','temp'), 0700;
 Write_Test_Program($test_program);
 
 my $test = "echo hello | $test_program";
-my $expected_stdout = "Starting at position (-1|0)\ngot: hello\ngot: world\n";
+my $expected_stdout = qr/Starting at position (-1|0)\ngot: hello\ngot: world\n/;
 my $expected_stderr = '';
 
 {
@@ -61,13 +56,7 @@ my $test_stderr = catfile('t','temp',"test_program.stderr");
 
 system "$test 1>$test_stdout 2>$test_stderr";
 
-my $success = 1;
-
-if ($?)
-{
-  print "Encountered an error executing the test when one was not expected.\n";
-  $success = 0;
-}
+ok(!$?,'Executing external program');
 
 local $/ = undef;
 my $actual_stdout;
@@ -80,21 +69,9 @@ open ACTUAL_STDERR, $test_stderr;
 $actual_stderr = <ACTUAL_STDERR>;
 close ACTUAL_STDERR;
 
-if ($actual_stdout =~ /^\Q$expected_stdout\E$/)
-{
-  print "Standard output \"$actual_stdout\" does not match expected output " .
-    "\"$expected_stdout\".\n";
-  $success = 0;
-}
+like($actual_stdout,$expected_stdout,'Output matches');
 
-if ($actual_stderr ne $expected_stderr)
-{
-  print "Standard error \"$actual_stderr\" does not match expected error " .
-    "\"$expected_stderr\".\n";
-  $success = 0;
-}
-
-ok($success);
+is($actual_stderr,$expected_stderr,'Stderr matches');
 
 # -------------------------------------------------------------------------------
 

@@ -1,9 +1,6 @@
 use strict;
-use lib 'lib';
 use FileHandle::Unget;
-use Test;
-
-plan (tests => 1);
+use Test::More tests => 1;
 
 eval 'require Devel::Leak';
 
@@ -11,8 +8,10 @@ eval 'require Devel::Leak';
 new FileHandle::Unget();
 
 # Check for memory leaks.
-if (defined $Devel::Leak::VERSION)
+SKIP:
 {
+  skip('Devel::Leak not installed',1) unless defined $Devel::Leak::VERSION;
+
   my $fhu_handle;
 
   my $start_fhu = Devel::Leak::NoteSV($fhu_handle);
@@ -23,9 +22,5 @@ if (defined $Devel::Leak::VERSION)
   my $end_fhu = Devel::Leak::NoteSV($fhu_handle);
 
   # 1
-  ok($end_fhu - $start_fhu,0);
-}
-else
-{
-  skip('Devel::Leak not installed',1);
+  is($end_fhu - $start_fhu,0, 'Memory leak');
 }

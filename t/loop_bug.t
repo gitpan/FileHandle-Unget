@@ -1,10 +1,7 @@
 use strict;
-use lib 'lib';
 use FileHandle::Unget;
 use File::Spec::Functions qw(:ALL);
-use Test;
-
-plan (tests => 1);
+use Test::More tests => 1;
 
 my $filename = catfile('t','temp', 'output.txt');
 
@@ -40,7 +37,7 @@ my $filename = catfile('t','temp', 'output.txt');
   }
 
   # 1
-  ok($bytes_read,-s $filename);
+  is($bytes_read,-s $filename, 'Loop bug');
 
   $fh->close;
 }

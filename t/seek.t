@@ -1,10 +1,7 @@
 use strict;
-use lib 'lib';
 use FileHandle::Unget;
 use File::Spec::Functions qw(:ALL);
-use Test;
-
-plan (tests => 3);
+use Test::More tests => 3;
 
 my $filename = catfile('t','temp', 'output.txt');
 
@@ -28,7 +25,7 @@ my $filename = catfile('t','temp', 'output.txt');
   my $line = <$fh>;
 
   # 1
-  ok($line,"second line\n");
+  is($line,"second line\n",'Seek absolute');
 
   $fh->ungets('1234567890');
 
@@ -36,7 +33,7 @@ my $filename = catfile('t','temp', 'output.txt');
   $line = <$fh>;
 
   # 2
-  ok($line,"this is the first line\n");
+  is($line,"this is the first line\n",'Seek to front');
 
   $fh->ungets("1234567890\n");
 
@@ -44,7 +41,7 @@ my $filename = catfile('t','temp', 'output.txt');
   $line = <$fh>;
 
   # 3
-  ok($line,"first line\n");
+  is($line,"first line\n",'Seek backward');
 
   $fh->close;
 }

@@ -1,10 +1,7 @@
 use strict;
-use lib 'lib';
 use FileHandle::Unget;
 use File::Spec::Functions qw(:ALL);
-use Test;
-
-plan (tests => 7);
+use Test::More tests => 7;
 
 my $filename = catfile('t','temp', 'output.txt');
 
@@ -29,13 +26,13 @@ my $filename = catfile('t','temp', 'output.txt');
   my $line1 = <$fh1>;
 
   # 1
-  ok($line1, "first line\n");
+  is($line1, "first line\n", 'First line');
 
   local $/ = undef;
   my $line2 = <$fh1>;
 
   # 2
-  ok($line2, "second line\nthird line\n");
+  is($line2, "second line\nthird line\n", 'No eol separator');
 
   $fh1->close;
 }
@@ -48,7 +45,7 @@ my $filename = catfile('t','temp', 'output.txt');
   my $line1 = <$fh1>;
 
   # 3
-  ok($line1, "first line\n");
+  is($line1, "first line\n", 'First line');
 
   $fh1->input_record_separator("\n");
 
@@ -56,14 +53,14 @@ my $filename = catfile('t','temp', 'output.txt');
   my $line2 = <$fh1>;
 
   # 4
-  ok($line2, "second line\n");
+  is($line2, "second line\n", 'Second line');
 
   $fh1->ungets($line2);
   $fh1->clear_input_record_separator();
   my $line3 = <$fh1>;
 
   #5
-  ok($line3, "second line\nthird line\n");
+  is($line3, "second line\nthird line\n", 'Newline end of file');
 
   $fh1->close;
 }
@@ -83,9 +80,9 @@ my $filename = catfile('t','temp', 'output.txt');
   my $line2 = <$fh2>;
 
   # 6
-  ok($line1, "first line\n");
+  is($line1, "first line\n", 'First line');
   # 7
-  ok($line2, "first line\nsecond line\nthird line\n");
+  is($line2, "first line\nsecond line\nthird line\n", 'Undef end of line');
 
   $fh1->close;
   $fh2->close;
