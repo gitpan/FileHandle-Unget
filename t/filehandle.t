@@ -6,7 +6,7 @@ use FileHandle::Unget;
 use File::Spec::Functions qw(:ALL);
 use Test;
 
-plan (tests => 12);
+plan (tests => 13);
 
 my $filename = catfile('t','temp', 'output.txt');
 
@@ -94,6 +94,18 @@ my $filename = catfile('t','temp', 'output.txt');
   ok($buf,'first li');
   # 12
   ok($result,8);
+
+  $fh->close;
+}
+
+# Test new_from_fd
+{
+  open FILE, "$filename";
+  my $fh = FileHandle::Unget->new_from_fd(\*FILE,'r');
+
+  my $line = <$fh>;
+  # 13
+  ok($line,"first line\n");
 
   $fh->close;
 }

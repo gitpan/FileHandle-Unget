@@ -91,7 +91,7 @@ sub Compute_Makefile_Attributes
     'PM' => {
       'lib/FileHandle/Unget.pm' => '$(INST_LIB)/FileHandle/Unget.pm',
     },
-    'PREREQ_PM' => { WeakRef => 0, },
+    'PREREQ_PM' => { 'Scalar::Util' => 0, },
 
     'DIR' => [ ],
   );

@@ -5,6 +5,7 @@ use Symbol;
 use FileHandle;
 use Exporter;
 use bytes;
+use Scalar::Util qw( weaken );
 
 use 5.000;
 
@@ -12,7 +13,7 @@ use vars qw( @ISA $VERSION $AUTOLOAD @EXPORT @EXPORT_OK );
 
 @ISA = qw( Exporter FileHandle );
 
-$VERSION = '0.14';
+$VERSION = '0.15';
 
 @EXPORT = @FileHandle::EXPORT;
 @EXPORT_OK = @FileHandle::EXPORT_OK;
@@ -80,8 +81,6 @@ sub DESTROY
 
 #-------------------------------------------------------------------------------
 
-use WeakRef;
-
 sub new
 {
   my $class = shift;
@@ -95,6 +94,39 @@ sub new
   else
   {
     $self = $class->SUPER::new(@_);
+    return undef unless defined $self;
+  }
+
+  my $values =
+    {
+      'fh' => $self,
+      'eof_called' => 0,
+      'filehandle_unget_buffer' => '',
+    };
+
+  weaken($values->{'fh'});
+  
+  tie *$self, "${class}::Tie", $values;
+
+  bless $self, $class;
+  return $self;
+}
+
+#-------------------------------------------------------------------------------
+
+sub new_from_fd
+{
+  my $class = shift;
+
+  my $self;
+
+#  if (defined $_[0] && defined fileno $_[0])
+#  {
+#    $self = shift;
+#  }
+#  else
+  {
+    $self = $class->SUPER::new_from_fd(@_);
     return undef unless defined $self;
   }
 
@@ -164,7 +196,7 @@ $VERSION = '0.10';
 
 my %tie_mapping = (
   PRINT => 'print', PRINTF => 'printf', WRITE => 'syswrite',
-  READLINE => 'getline', GETC => 'getc', READ => 'read', CLOSE => 'close',
+  READLINE => 'getline_wrapper', GETC => 'getc', READ => 'read', CLOSE => 'close',
   BINMODE => 'binmode', OPEN => 'open', EOF => 'eof', FILENO => 'fileno',
   SEEK => 'seek', TELL => 'tell', FETCH => 'fetch',
 );
@@ -185,8 +217,6 @@ sub AUTOLOAD
   *{$name} = sub
     {
       my $self = shift;
-
-      $sub = 'getlines' if $sub eq 'getline' && wantarray;
 
       if (defined &$sub)
       {
@@ -281,6 +311,20 @@ sub fileno
   tie *{$self->{'fh'}}, __PACKAGE__, $self;
 
   return $fileno;
+}
+
+#-------------------------------------------------------------------------------
+
+sub getline_wrapper
+{
+  if (wantarray)
+  {
+    goto &getlines;
+  }
+  else
+  {
+    goto &getline;
+  }
 }
 
 #-------------------------------------------------------------------------------
@@ -570,7 +614,11 @@ sub tell
 
   my $file_position = tell $self->{'fh'};
 
-  return -1 if $file_position == -1;
+  if ($file_position == -1)
+  {
+    tie *{$self->{'fh'}}, __PACKAGE__, $self;
+    return -1;
+  }
 
   $file_position -= length($self->{'filehandle_unget_buffer'});
 

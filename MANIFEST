@@ -4,6 +4,7 @@ CHANGES                               A change history
 LICENSE                               A copy of the license
 Makefile.PL                           Makes the makefile
 lib/FileHandle/Unget.pm               One of the module files
+t/stdin_tell_bug.t                    Test program
 t/binmode_bug.t                       Test program
 t/buffer.t                            Test program
 t/class_pipe.t                        Test program

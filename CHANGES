@@ -1,3 +1,15 @@
+Version 0.15:
+- Switched from WeakRef to Scalar::Util, which is included in recent versions
+  of Perl. (Thanks to Joey Hess <joey@kitenet.net> for the suggestion and
+  patch.)
+- Fixed a bug involving pipes and tell(), where tell() would cause following
+  operations to fail. (Thanks to Karol Szafranski <szafrans@imb-jena.de> for
+  the bug report.)
+- Added new_from_fd support (Thanks to Karol Szafranski <szafrans@imb-jena.de>
+  for the bug report.)
+- Fixed a bug in which <$fh> would always behave as if called in a list
+  context after the first such call.
+
 Version 0.14:
 - Fixed an incompatibility with perl 5.6.1 and Data::Dumper. (Thanks to Jason
   Brunette <jbrunette@users.sourceforge.net> for the bug report and patch.)
