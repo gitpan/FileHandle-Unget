@@ -6,26 +6,16 @@ can be called more than once in a row, and an ungets(SCALAR) which places a
 string of bytes back on the input.
 
 
-NEW IN THIS VERSION
-
-Version 0.1621: Sun Feb 6 2005
-- Improved compatibility with versions of Perl older than 5.6.0, by replacing
-  "use bytes" with "use ExtUtils::MakeMaker::bytes".
-- Fixed test case error reporting for tests that fail to fork.
-- Fixed unexpected success of binmode_bug.t test on Windows 2000. (Thanks to
-  Max Maischein for the bug report.)
-- Fixed a bug in stdin_tell_bug.t. (Thanks to Max Maischein for the bug
-  report.)
-
-
 MODULE DEPENDENCIES
- 
+
 To use this module, you will need to install:
 
 - Scalar::Util
 
-You should be prompted to install this module automatically when you run "perl
-Makefile.PL".
+To test this module, you will need to install:
+
+- Test::More
+- File::Spec
 
 
 INSTALLATION
@@ -85,13 +75,16 @@ you can also do "man FileHandle::Unget".
 
 HOMEPAGE
 
-Visit http://fh-unget.sourceforge.net/ for the latest version, mailing lists,
-discussion forums, CVS access, and more.
+The CPAN Page:
+http://search.cpan.org/~dcoppit/FileHandle-Unget/
+
+The Google Code page:
+http://code.google.com/p/filehandle-unget/
 
 
 REPORTING BUGS
 
-You can report bugs by filing a bug report at the project homepage. 
+http://code.google.com/p/filehandle-unget/issues/entry
 
 
 COPYRIGHT
@@ -102,10 +95,11 @@ Coppit. All rights reserved, save those granted by the license.
 
 LICENSE
 
-This code is distributed under the GNU General Public License (GPL).  See
-the file LICENSE included in the distribution.
+This code is distributed under the GNU General Public License (GPL). See the
+file LICENSE in the distribution, http://www.opensource.org/gpl-license.html,
+and http://www.opensource.org/.
 
 
 AUTHOR
 
-David Coppit <david@coppit.org> 
+David Coppit <david@coppit.org>

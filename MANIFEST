@@ -30,22 +30,13 @@ t/ungetc.t
 t/ungets.t
 
 # Module::Install extensions
-inc/ExtUtils/AutoInstall.pm
-inc/File/Spec.pm
-inc/File/Spec/Functions.pm
-inc/File/Spec/Unix.pm
-inc/Module/Install/AutoInstall.pm
+inc/Module/Install.pm
 inc/Module/Install/Base.pm
 inc/Module/Install/Can.pm
 inc/Module/Install/Fetch.pm
-inc/Module/Install/Include.pm
 inc/Module/Install/Makefile.pm
 inc/Module/Install/Metadata.pm
 inc/Module/Install/Win32.pm
 inc/Module/Install/WriteAll.pm
-inc/Module/Install.pm
-inc/Scalar/Util.pm
-inc/Test/Builder.pm
-inc/Test/More.pm
 
-META.yml                                Module meta-data (added by MakeMaker)
+META.yml
