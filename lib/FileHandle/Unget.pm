@@ -4,16 +4,15 @@ use strict;
 use Symbol;
 use FileHandle;
 use Exporter;
-use ExtUtils::MakeMaker::bytes;
 use Scalar::Util qw( weaken );
 
-use 5.000;
+use 5.005;
 
 use vars qw( @ISA $VERSION $AUTOLOAD @EXPORT @EXPORT_OK );
 
 @ISA = qw( Exporter FileHandle );
 
-$VERSION = sprintf "%d.%02d%02d", q/0.16.22/ =~ /(\d+)/g;
+$VERSION = sprintf "%d.%02d%02d", q/0.16.23/ =~ /(\d+)/g;
 
 @EXPORT = @FileHandle::EXPORT;
 @EXPORT_OK = @FileHandle::EXPORT_OK;
@@ -389,7 +388,7 @@ sub getline
     {
       $line = undef;
     }
-    else
+    elsif (defined $templine)
     {
       $line .= $templine;
     }

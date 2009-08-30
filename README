@@ -76,7 +76,7 @@ you can also do "man FileHandle::Unget".
 HOMEPAGE
 
 The CPAN Page:
-http://search.cpan.org/~dcoppit/FileHandle-Unget/
+http://search.cpan.org/dist/FileHandle-Unget/
 
 The Google Code page:
 http://code.google.com/p/filehandle-unget/

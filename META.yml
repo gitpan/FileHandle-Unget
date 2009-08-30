@@ -1,10 +1,28 @@
-#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
-name:         FileHandle-Unget
-version:      0.15
-version_from: lib/FileHandle/Unget.pm
-installdirs:  site
-requires:
-    Scalar::Util:                  0
-
+---
+abstract: 'FileHandle which supports multi-byte unget'
+author:
+  - 'David Coppit <david@coppit.org>.'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  File::Spec::Functions: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
 distribution_type: module
-generated_by: ExtUtils::MakeMaker version 6.12
+generated_by: 'Module::Install version 0.91'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+module_name: FileHandle::Unget
+name: FileHandle-Unget
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Scalar::Util: 1.14
+  perl: 5.005
+resources:
+  license: http://opensource.org/licenses/gpl-license.php
+version: 0.1623

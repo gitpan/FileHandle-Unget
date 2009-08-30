@@ -1,3 +1,10 @@
+Version 0.1623: Sun Aug 9 2009
+- Fixed a bug where files with binary data would sometimes cause an
+	unitialized value warning at line 394 as well as incorrect behavior. (Thanks
+	to Bill Nugent <whn@lopi.com> for the bug report and initial patch.)
+- Removed unused ExtUtils::MakeMaker::bytes, which doesn't exist anymore
+	anyway. (Thanks to Slaven Rezić <srezic@cpan.org> for the bug report.)
+
 Version 0.1622: Wed Jul 16 2008
 - Updated to the latest version of Module::Install
 - Removed auto-install for better compatibility with CPAN and others
